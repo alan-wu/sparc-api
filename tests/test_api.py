@@ -64,6 +64,9 @@ def test_map_get_share_link_and_state(client):
   assert "state" in returned_data
   assert returned_data["state"]["type"] == "scaffold"
   assert returned_data["state"]["value"] == 1234
+  
+  r = client.post(f"/map/getstate", json = {"uuid": "1234567"})
+  assert r.status_code == 400
 
   r = client.post(f"/map/getstate", json = {})
   assert r.status_code == 400

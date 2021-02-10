@@ -386,11 +386,10 @@ def get_share_link():
         commit = False
     if mapstate:
         json_data = request.get_json()
-        if json_data:
+        if json_data and 'state' in json_data:
             state = json_data['state']
-            if state:
-                uuid = mapstate.pushState(state, commit)
-                return jsonify({"uuid": uuid})
+            uuid = mapstate.pushState(state, commit)
+            return jsonify({"uuid": uuid})
         abort(400, description="State not specified")
     else:
         abort(404, description="Database not available")
@@ -400,11 +399,11 @@ def get_share_link():
 def get_map_state():
     if mapstate:
         json_data = request.get_json()
-        if json_data:
+        if json_data and 'uuid' in json_data:
             uuid = json_data['uuid']
             state = mapstate.pullState(uuid)
             if state:
                 return jsonify({"state": mapstate.pullState(uuid)})
-        abort(400, description="cannot find data with uuid")
+        abort(400, description="Key missing or did not find a match")
     else:
         abort(404, description="Database not available")

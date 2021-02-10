@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker
 import json
 import uuid
 
+#use the declarative syntax of sqlalchemy
 base = declarative_base()
 
 class State(base):  
