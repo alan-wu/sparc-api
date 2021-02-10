@@ -379,29 +379,32 @@ def authenticate_biolucida():
 
 #get the share link for the current map content
 @app.route("/map/getsharelink", methods=["POST"])
-def get_share_link(commit = True):
+def get_share_link():
+    #Do not commit to database when testing
+    commit = True
+    if app.config["TESTING"]:
+        commit = False
     if mapstate:
-        state = request.json.get('state')
-        if state:
-            uuid = mapstate.pushState(state, commit)
-            return jsonify({"uuid": uuid})
-        else:
-            abort(404, description="State not specified")
+        json_data = request.get_json()
+        if json_data:
+            state = json_data['state']
+            if state:
+                uuid = mapstate.pushState(state, commit)
+                return jsonify({"uuid": uuid})
+        abort(400, description="State not specified")
     else:
-          abort(404, description="Database not available")
+        abort(404, description="Database not available")
 
 #get the map state using the share link id
 @app.route("/map/getstate", methods=["POST"])
 def get_map_state():
     if mapstate:
-        uuid = request.json.get('uuid')
-        if uuid:
+        json_data = request.get_json()
+        if json_data:
+            uuid = json_data['uuid']
             state = mapstate.pullState(uuid)
             if state:
                 return jsonify({"state": mapstate.pullState(uuid)})
-            else:
-                abort(404, description="cannot find data with uuid")
-        else:
-            abort(404, description="uuid is not available")
+        abort(400, description="cannot find data with uuid")
     else:
         abort(404, description="Database not available")
