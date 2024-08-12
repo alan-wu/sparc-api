@@ -1,3 +1,5 @@
+from app.scicrunch_processing_common import get_mimetypes_from_types
+
 #Hardcoded list for getting whole body scaffold,
 #Update this list as needed
 BODY_SCAFFOLD_DATASET = {
@@ -342,9 +344,61 @@ def facet_query_string(query, terms, facets, type_map):
             qt += " AND "
     return qt
 
+def get_species_file_types_query(species, file_types):
+    query = {
+                "bool": {
+                    "must": [
+
+                    ]
+                }
+            }
+
+    # Construct the query if there is a list of species 
+    if len(species) > 0:
+        species_query = {
+            "query_string": {
+                "fields": [
+                    "*species.name"
+                ]
+            }
+        }
+
+        query_string = ''
+
+        for item in species:
+            if item != species[0]:
+                query_string += ' OR '
+            query_string += f"({item})"
+        species_query["query_string"]["query"] = query_string
+        query['bool']['must'].append(species_query)
+
+    mimetypes = get_mimetypes_from_types(file_types)
+    
+    if len(mimetypes) > 0:
+        types_query = {
+            "query_string": {
+                "fields": [
+                    "objects.additional_mimetype.name"
+                ]
+            }
+        }
+
+        query_string = ''
+
+        for item in mimetypes:
+            if item != mimetypes[0]:
+                query_string += ' OR '
+            types_query += f"({item})"
+        types_query["query_string"]["query"] = query_string
+        query['bool']['must'].append(types_query)
+
+
+    return query
+
+    
 
 # create the request body for requesting list of uberon ids
-def create_request_body_for_curies(species):
+def create_request_body_for_curies_aggregations(species, file_types):
     body = {
         "from": 0,
         "size": 0,
@@ -355,29 +409,22 @@ def create_request_body_for_curies(species):
                         "lang": "painless",
                         "inline": "def a=null;if(params['_source']['anatomy'] != null ) { if(params['_source']['anatomy']['organ'] != null ) { a = params['_source']['anatomy']['organ'];}} return a;"
                     },
-                    "size": 200
+                    "size": 400
                 }
+            }
+        },
+        "query": {
+            "bool": {
+                "must": [
+
+                ]
             }
         }
     }
 
-    # Construct the query if there is a list of species 
-    if len(species) > 0:
-        query = {
-            "query_string": {
-                "fields": [
-                    "*species.name"
-                ],
-            }
-        }
+    query = get_species_file_types_query(species, file_types)
 
-        query_string = ''
+    body['query'] = query
 
-        for item in species:
-            if item != species[0]:
-                query_string += ' OR '
-            query_string += f"({item})"
-        query["query_string"]["query"] = query_string
-        body['query'] = query
 
     return body

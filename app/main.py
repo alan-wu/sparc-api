@@ -33,7 +33,7 @@ from PIL import Image
 from requests.auth import HTTPBasicAuth
 
 from app.scicrunch_requests import create_doi_query, create_filter_request, create_facet_query, create_doi_aggregate, create_title_query, \
-    create_identifier_query, create_pennsieve_identifier_query, create_field_query, create_request_body_for_curies, create_onto_term_query, \
+    create_identifier_query, create_pennsieve_identifier_query, create_field_query, create_request_body_for_curies_aggregations, create_onto_term_query, \
     create_multiple_doi_query, create_multiple_discoverId_query, create_anatomy_query, get_body_scaffold_dataset_id, \
     create_multiple_mimetype_query
 from scripts.email_sender import EmailSender, feedback_email, general_interest_email, issue_reporting_email, creation_request_confirmation_email, service_interest_email
@@ -1323,11 +1323,18 @@ def get_mailchimp_member_info(email_address):
 
 
 # Get list of available name / curie pair
+# It accepts two parameters - 
+#   species - "human", "rat" and etc
+#   filetypes - type of additional mimetype as stated in scicrunch_processing_common
+#    'mbf-segmentation', 'biolucida-2d' and 'etc'
+# 
 @app.route("/get-organ-curies/")
 def get_available_uberonids():
     species = request.args.getlist('species')
 
-    requestBody = create_request_body_for_curies(species)
+    file_types = request.args.getlist('filetypes')
+
+    requestBody = create_request_body_for_curies_aggregations(species, file_types)
 
     result = {}
 
