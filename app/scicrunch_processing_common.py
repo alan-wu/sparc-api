@@ -89,6 +89,7 @@ def map_mime_type(mime_type, obj):
 
     return NOT_SPECIFIED
 
+
 def get_mimetypes_from_types(types):
     mimetypes = []
 

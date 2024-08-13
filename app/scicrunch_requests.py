@@ -9,6 +9,12 @@ BODY_SCAFFOLD_DATASET = {
     'rat': 147
 }
 
+#Can not use re.escape as forward slash is not included
+#Only include the ones included in mimetype
+sc = str.maketrans({"-": "\\-", ".": "\\.", "/": "\\/", "+": "\\+"})
+
+def escape_query_term(term):
+    return term.translate(sc)
 
 def create_query_string(query_string):
     return {
@@ -388,10 +394,9 @@ def get_species_file_types_query(species, file_types):
         for item in mimetypes:
             if item != mimetypes[0]:
                 query_string += ' OR '
-            types_query += f"({item})"
+            query_string += f"({escape_query_term(item)})"
         types_query["query_string"]["query"] = query_string
         query['bool']['must'].append(types_query)
-
 
     return query
 
