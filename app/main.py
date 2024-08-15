@@ -1359,7 +1359,6 @@ def get_available_uberonids():
 # This will return a list of curies to ids pair based on the criteria
 #
 @app.route("/get-datasetids-for-curies", methods=["POST"])
-@app.route("/get-datasetids-for-curies/", methods=["POST"])
 def get_datasetIds_from_types_curies():
 
     json_data = request.get_json()
