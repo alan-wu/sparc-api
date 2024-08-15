@@ -400,8 +400,6 @@ def get_species_file_types_query(species, file_types):
 
     return query
 
-    
-
 # create the request body for requesting list of uberon ids
 def create_request_body_for_curies_aggregations(species, file_types):
     body = {
@@ -417,13 +415,6 @@ def create_request_body_for_curies_aggregations(species, file_types):
                     "size": 400
                 }
             }
-        },
-        "query": {
-            "bool": {
-                "must": [
-
-                ]
-            }
         }
     }
 
@@ -431,5 +422,45 @@ def create_request_body_for_curies_aggregations(species, file_types):
 
     body['query'] = query
 
+    return body
+
+
+def get_filters_for_aggregations(curies):
+    filters = {}
+
+    # Construct the query if there is a list of species 
+    if len(curies) > 0:
+        for item in curies:
+            filters[item] = {
+                "term": { "anatomy.organ.curie.aggregate": item }
+            }
+
+    return filters
+
+# create the request body for requesting list of dataset ids pairing with curies
+def create_request_body_for_ids_aggregations(curies, species, file_types):
+    body = {
+        "size": 0,
+        "aggs": {
+            "f": {
+                "filters": {
+                    "filters": { }
+                },
+                "aggs": {
+                    "id": {
+                            "terms": {"field": "pennsieve.identifier.aggregate"}
+                    }
+                }
+            }
+        }
+    }
+
+    query = get_species_file_types_query(species, file_types)
+
+    filters = get_filters_for_aggregations(curies)
+
+    body["aggs"]["f"]["filters"]["filters"] = filters
+
+    body['query'] = query
 
     return body

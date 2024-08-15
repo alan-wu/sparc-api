@@ -233,6 +233,24 @@ def reform_curies_results(data):
 
     return result
 
+# Turn the result into a list in the uberon.array field
+def reform_ids_results(data):
+    result = {
+        'ids': { }
+    }
+
+    # Iterate through to get an uberon - ids map
+    for key, item in data['aggregations']['f']['buckets'].items():
+        try:
+            ids = []
+            for bucket in item['id']['buckets']:
+                ids.append(bucket['key'])
+            result['ids'][key] = ids
+        except KeyError:
+            continue
+
+    return result
+
 
 # Turn the result into a list in the uberon.array field
 def reform_related_terms(data):
