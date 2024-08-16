@@ -448,7 +448,7 @@ def create_request_body_for_ids_aggregations(curies, species, file_types):
                 },
                 "aggs": {
                     "id": {
-                            "terms": {"field": "pennsieve.identifier.aggregate"}
+                        "terms": {"field": "pennsieve.identifier.aggregate"}
                     }
                 }
             }
@@ -458,6 +458,78 @@ def create_request_body_for_ids_aggregations(curies, species, file_types):
     query = get_species_file_types_query(species, file_types)
 
     filters = get_filters_for_aggregations(curies)
+
+    body["aggs"]["f"]["filters"]["filters"] = filters
+
+    body['query'] = query
+
+    return body
+
+# Painless script for getting file information out
+def get_script_for_aggregations(file_types):
+    script = {"lang": "painless"}
+
+    mimetypes = get_mimetypes_from_types(file_types)
+
+    conditions = ''
+
+    if len(mimetypes) > 0:
+        conditions = ' && ('
+        cl = []
+        for v in mimetypes:
+            cl.append(f"t == '{v}'")
+        conditions = conditions + ' || '.join(cl) + ")"
+
+    conditions = f'if (t != null{conditions})'
+
+    inline = "List l = new ArrayList();\
+        def ver = params['_source']['pennsieve']['version']['identifier'];\
+        def id = params['_source']['pennsieve']['identifier'];\
+        for (item in params['_source']['objects'])\
+        {\
+            def t = item['additional_mimetype']['name'];"
+    inline = inline + conditions + "{\
+                def i = [:];i['id']=id;\
+                i['version']=ver;\
+                i['path'] = item['dataset']['path'];\
+                i['datacite'] = item['datacite'];\
+                i['additional_mimetypes'] = t;\
+                l.add(i);\
+            }\
+        }\
+        return l;"
+
+    script["inline"] = inline
+
+    return script
+
+# create the request body for requesting list of file infos ids pairing with curies
+def create_request_body_for_files_info_aggregations(curies, species, file_types):
+    body = {
+        "size": 0,
+        "aggs": {
+            "f": {
+                "filters": {
+                    "filters": { }
+                },
+                "aggs": {
+                    "files_info": {
+                        "terms": {
+                            "script": { }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    query = get_species_file_types_query(species, file_types)
+
+    filters = get_filters_for_aggregations(curies)
+
+    ps = get_script_for_aggregations(file_types)
+
+    body["aggs"]["f"]["aggs"]["files_info"]['terms']['script'] = ps
 
     body["aggs"]["f"]["filters"]["filters"] = filters
 

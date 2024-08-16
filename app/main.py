@@ -35,7 +35,7 @@ from requests.auth import HTTPBasicAuth
 from app.scicrunch_requests import create_doi_query, create_filter_request, create_facet_query, create_doi_aggregate, create_title_query, \
     create_identifier_query, create_pennsieve_identifier_query, create_field_query, create_request_body_for_curies_aggregations, create_onto_term_query, \
     create_multiple_doi_query, create_multiple_discoverId_query, create_anatomy_query, get_body_scaffold_dataset_id, \
-    create_multiple_mimetype_query, create_request_body_for_ids_aggregations
+    create_multiple_mimetype_query, create_request_body_for_ids_aggregations, create_request_body_for_files_info_aggregations
 from scripts.email_sender import EmailSender, feedback_email, general_interest_email, issue_reporting_email, creation_request_confirmation_email, service_interest_email
 from threading import Lock
 from xml.etree import ElementTree
@@ -43,7 +43,8 @@ from xml.etree import ElementTree
 from app.config import Config
 from app.dbtable import MapTable, ScaffoldTable, FeaturedDatasetIdSelectorTable
 from app.scicrunch_process_results import process_results, process_get_first_scaffold_info, reform_aggregation_results, \
-    reform_curies_results, reform_dataset_results, reform_related_terms, reform_anatomy_results, reform_ids_results
+    reform_curies_results, reform_dataset_results, reform_related_terms, reform_anatomy_results, reform_ids_results, \
+    reform_files_info_results
 from app.serializer import ContactRequestSchema
 from app.utilities import img_to_base64_str, get_path_from_mangled_list
 from app.osparc.osparc import start_simulation as do_start_simulation
@@ -1351,7 +1352,7 @@ def get_available_uberonids():
 
 
 # Get list of matching file type, species organ curie to datset id
-# It accepts three parameters - 
+# It accepts three parameters -
 #   curies - list of organ curies
 #   species - "human", "rat" and etc
 #   filetypes - type of additional mimetype as stated in scicrunch_processing_common
@@ -1379,6 +1380,42 @@ def get_datasetIds_from_types_curies():
         
         try:
             return reform_ids_results(response.json())
+        except BaseException:
+            return jsonify({'message': 'Could not parse SciCrunch output, please try again later',
+                            'error': 'BaseException'}), 502
+    else:
+        abort(400, description="Missing json body")
+
+
+# Get list of file information based on file type, species organ curie to datset id
+# It accepts three parameters -
+#   curies - list of organ curies
+#   species - "human", "rat" and etc
+#   filetypes - type of additional mimetype as stated in scicrunch_processing_common
+#    'mbf-segmentation', 'biolucida-2d' and 'etc'
+# This will return a list of curies to ids pair based on the criteria
+#
+@app.route("/get-files-info-for-curies", methods=["POST"])
+def get_files_info_from_types_curies():
+
+    json_data = request.get_json()
+
+    if json_data:
+
+        curies = json_data.get("curies", [])
+
+        species = json_data.get("species", [])
+
+        file_types = json_data.get("filetypes", [])
+
+        request_body = create_request_body_for_files_info_aggregations(curies, species, file_types)
+
+        response = requests.post(
+            f'{Config.SCI_CRUNCH_HOST}/_search?api_key={Config.KNOWLEDGEBASE_KEY}',
+            json=request_body)
+
+        try:
+            return reform_files_info_results(response.json())
         except BaseException:
             return jsonify({'message': 'Could not parse SciCrunch output, please try again later',
                             'error': 'BaseException'}), 502

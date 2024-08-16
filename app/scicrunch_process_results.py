@@ -251,6 +251,21 @@ def reform_ids_results(data):
 
     return result
 
+# Turn the result into a list in the uberon.array field
+def reform_files_info_results(data):
+    result = {
+        'files_info': { }
+    }
+
+    # Iterate through to get an uberon - ids map
+    for key, item in data['aggregations']['f']['buckets'].items():
+        files_info = []
+        for bucket in item['files_info']['buckets']:
+            files_info.append(bucket['key'])
+        result['files_info'][key] = files_info
+
+    return result
+
 
 # Turn the result into a list in the uberon.array field
 def reform_related_terms(data):
