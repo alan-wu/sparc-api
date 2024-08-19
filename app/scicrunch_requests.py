@@ -514,7 +514,8 @@ def create_request_body_for_files_info_aggregations(curies, species, file_types)
                 "aggs": {
                     "files_info": {
                         "terms": {
-                            "script": { }
+                            "script": { },
+                            "size": 400
                         }
                     }
                 }
