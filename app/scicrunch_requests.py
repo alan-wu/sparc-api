@@ -481,29 +481,28 @@ def get_script_for_aggregations(file_types):
         conditions = conditions + ' || '.join(cl) + ")"
 
     conditions = f'if (t != null{conditions})'
-
     inline = "List l = new ArrayList();\
         def ver = params['_source']['pennsieve']['version']['identifier'];\
         def id = params['_source']['pennsieve']['identifier'];\
         for (item in params['_source']['objects'])\
         {\
             def t = item['additional_mimetype']['name'];"
-    inline = inline + conditions + "{\
-                def i = [:];i['id']=id;\
-                i['version']=ver;\
-                i['path'] = item['dataset']['path'];\
-                i['datacite'] = item['datacite'];\
-                i['additional_mimetypes'] = t;\
-                l.add(i);\
+    inline = inline + conditions
+    inline = inline + "{def output = id + ',' + ver + ',' + item['dataset']['path'] + ','\
+                + t + ',' + item['datacite']['isSourceOf']['path'] + ',' + \
+                item['datacite']['isDerivedFrom']['path']; \
+                l.add(output);\
             }\
         }\
         return l;"
-
+    
     script["inline"] = inline
-
     return script
 
 # create the request body for requesting list of file infos ids pairing with curies
+# The output will be in a command separate list with value
+# of the following properties:
+# dataset id, version, file path, is source of, is derived from
 def create_request_body_for_files_info_aggregations(curies, species, file_types):
     body = {
         "size": 0,

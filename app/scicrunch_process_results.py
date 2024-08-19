@@ -251,18 +251,48 @@ def reform_ids_results(data):
 
     return result
 
+def extraListValues(text):
+    my_list = []
+    v = text.split(',')
+    for path in v:
+        if path:
+            my_list.append(path)
+    return my_list
+
 # Turn the result into a list in the uberon.array field
+# The output from the source data is in a command separate 
+# list with value
+# of the following properties:
+# dataset id, version, file path, additional_mimetype,
+# is source of, is derived from
+# This will turn it into json format
 def reform_files_info_results(data):
     result = {
         'files_info': { }
     }
-
     # Iterate through to get an uberon - ids map
     for key, item in data['aggregations']['f']['buckets'].items():
-        files_info = []
-        for bucket in item['files_info']['buckets']:
-            files_info.append(bucket['key'])
-        result['files_info'][key] = files_info
+        try:
+            files_info = []
+            for bucket in item['files_info']['buckets']:
+                s = bucket['key']
+                file_info = {}
+                v = s.split(',')
+                file_info['id'] = v[0]
+                file_info['version'] = v[1]
+                file_info['file_path'] = v[2]
+                file_info['additional_mimetype'] = v[3]
+                #is source if and is derived from are list values
+                l = s.split('[')
+                #remove last trailing ]
+                is_l = l[1][:-2]        
+                file_info['isSourceOf'] = extraListValues(is_l)
+                id_l = l[2][:-1]
+                file_info['isDerivedFrom'] = extraListValues(id_l)
+                files_info.append(file_info)
+            result['files_info'][key] = files_info
+        except KeyError:
+            continue
 
     return result
 
