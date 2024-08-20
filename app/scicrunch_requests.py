@@ -488,9 +488,19 @@ def get_script_for_aggregations(file_types):
         {\
             def t = item['additional_mimetype']['name'];"
     inline = inline + conditions
-    inline = inline + "{def output = id + ',' + ver + ',' + item['dataset']['path'] + ','\
-                + t + ',' + item['datacite']['isSourceOf']['path'] + ',' + \
-                item['datacite']['isDerivedFrom']['path']; \
+    inline = inline + "{String output = id + ',' + ver + ',' + item['dataset']['path'] + ','\
+                + t + ',';\
+                if (item['biolucida'] != null && item['biolucida']['identifier'] != null) { \
+                    output = output + item['biolucida']['identifier'] + ',';\
+                } else {\
+                    output = output + ',';\
+                }\
+                if (item['datacite'] != null) { \
+                    output = output + item['datacite']['isSourceOf']['path'] + ',' +\
+                    item['datacite']['isDerivedFrom']['path'];\
+                } else {\
+                    output = output + '[],[]';\
+                }\
                 l.add(output);\
             }\
         }\

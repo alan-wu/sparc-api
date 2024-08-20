@@ -264,7 +264,7 @@ def extraListValues(text):
 # list with value
 # of the following properties:
 # dataset id, version, file path, additional_mimetype,
-# is source of, is derived from
+# biolucida id, is source of, is derived from
 # This will turn it into json format
 def reform_files_info_results(data):
     result = {
@@ -282,6 +282,7 @@ def reform_files_info_results(data):
                 file_info['version'] = v[1]
                 file_info['file_path'] = v[2]
                 file_info['additional_mimetype'] = v[3]
+                file_info['biolucida_id'] = v[4]
                 #is source if and is derived from are list values
                 l = s.split('[')
                 #remove last trailing ]
