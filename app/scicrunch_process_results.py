@@ -256,6 +256,8 @@ def extraListValues(text):
     v = text.split(',')
     for path in v:
         if path:
+            #Remove any leading or trailing space
+            path = path.strip()
             my_list.append(path)
     return my_list
 
