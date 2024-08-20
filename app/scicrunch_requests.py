@@ -484,17 +484,25 @@ def get_script_for_aggregations(file_types):
     inline = "List l = new ArrayList();\
         def ver = params['_source']['pennsieve']['version']['identifier'];\
         def id = params['_source']['pennsieve']['identifier'];\
+        List species = new ArrayList();\
+        if (params['_source']['organisms'] != null && params['_source']['organisms']['subject'] != null) {\
+            for (subject in params['_source']['organisms']['subject'])\
+            {\
+                species.add(subject['species']['name']);\
+            }\
+        }\
         for (item in params['_source']['objects'])\
         {\
             def t = item['additional_mimetype']['name'];"
     inline = inline + conditions
-    inline = inline + "{String output = id + ',' + ver + ',' + item['dataset']['path'] + ','\
-                + t + ',';\
+    inline = inline + "{String output = id + ',' + ver + ',' + item['dataset']['path'] + \
+                ',' + item['mimetype']['name'] + ',' + t + ',';\
                 if (item['biolucida'] != null && item['biolucida']['identifier'] != null) { \
                     output = output + item['biolucida']['identifier'] + ',';\
                 } else {\
                     output = output + ',';\
                 }\
+                output = output + species + ',';\
                 if (item['datacite'] != null) { \
                     output = output + item['datacite']['isSourceOf']['path'] + ',' +\
                     item['datacite']['isDerivedFrom']['path'];\
@@ -512,7 +520,8 @@ def get_script_for_aggregations(file_types):
 # create the request body for requesting list of file infos ids pairing with curies
 # The output will be in a command separate list with value
 # of the following properties:
-# dataset id, version, file path, is source of, is derived from
+# dataset id, version, file path, mimetype, additional_mimetype,
+# biolucida id, species, is source of, is derived from
 def create_request_body_for_files_info_aggregations(curies, species, file_types):
     body = {
         "size": 0,

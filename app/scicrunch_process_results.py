@@ -4,6 +4,7 @@ import re
 from app.config import Config
 from flask import jsonify
 from app.scicrunch_processing_common import MAPPED_MIME_TYPES, SKIPPED_OBJ_ATTRIBUTES
+from app.manifest_name_to_discover_name import name_map
 
 
 def convert_patch_to_X(version):
@@ -265,14 +266,15 @@ def extraListValues(text):
 # The output from the source data is in a command separate 
 # list with value
 # of the following properties:
-# dataset id, version, file path, additional_mimetype,
-# biolucida id, is source of, is derived from
+# dataset id, version, file path, mimetype, additional_mimetype,
+# biolucida id, mimetype. is source of, is derived from
 # This will turn it into json format
 def reform_files_info_results(data):
     result = {
         'files_info': { }
     }
     # Iterate through to get an uberon - ids map
+    print(data)
     for key, item in data['aggregations']['f']['buckets'].items():
         try:
             files_info = []
@@ -282,19 +284,24 @@ def reform_files_info_results(data):
                 v = s.split(',')
                 file_info['id'] = v[0]
                 file_info['version'] = v[1]
-                file_info['file_path'] = v[2]
-                file_info['additional_mimetype'] = v[3]
-                if v[3] in MAPPED_MIME_TYPES:
-                    file_info['type'] = MAPPED_MIME_TYPES[v[3]]
+                file_path = 'files/' + v[2]  # Add the part we split on back
+                file_path = name_map.get(file_path, file_path).removeprefix('files/')
+                file_info['file_path'] = file_path
+                file_info['mimetype'] = v[3]
+                file_info['additional_mimetype'] = v[4]
+                if v[4] in MAPPED_MIME_TYPES:
+                    file_info['type'] = MAPPED_MIME_TYPES[v[4]]
                 else:
                     file_info['type'] = ''
-                file_info['biolucida_id'] = v[4]
+                file_info['biolucida_id'] = v[5]
                 #is source if and is derived from are list values
                 l = s.split('[')
                 #remove last trailing ]
-                is_l = l[1][:-2]        
+                s_l = l[1][:-2]
+                file_info['species'] = extraListValues(s_l)
+                is_l = l[2][:-2]        
                 file_info['isSourceOf'] = extraListValues(is_l)
-                id_l = l[2][:-1]
+                id_l = l[3][:-1]
                 file_info['isDerivedFrom'] = extraListValues(id_l)
                 files_info.append(file_info)
             result['files_info'][key] = files_info
