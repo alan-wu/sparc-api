@@ -3,7 +3,7 @@ import json
 import re
 from app.config import Config
 from flask import jsonify
-from app.scicrunch_processing_common import SKIPPED_OBJ_ATTRIBUTES
+from app.scicrunch_processing_common import MAPPED_MIME_TYPES, SKIPPED_OBJ_ATTRIBUTES
 
 
 def convert_patch_to_X(version):
@@ -282,6 +282,10 @@ def reform_files_info_results(data):
                 file_info['version'] = v[1]
                 file_info['file_path'] = v[2]
                 file_info['additional_mimetype'] = v[3]
+                if v[3] in MAPPED_MIME_TYPES:
+                    file_info['type'] = MAPPED_MIME_TYPES[v[3]]
+                else:
+                    file_info['type'] = ''
                 file_info['biolucida_id'] = v[4]
                 #is source if and is derived from are list values
                 l = s.split('[')
