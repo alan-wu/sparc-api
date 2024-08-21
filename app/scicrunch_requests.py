@@ -485,10 +485,24 @@ def get_script_for_aggregations(file_types):
         def ver = params['_source']['pennsieve']['version']['identifier'];\
         def id = params['_source']['pennsieve']['identifier'];\
         List species = new ArrayList();\
-        if (params['_source']['organisms'] != null && params['_source']['organisms']['subject'] != null) {\
-            for (subject in params['_source']['organisms']['subject'])\
+        def subject = null;\
+        if (params['_source']['organisms'] != null) {\
+            if (params['_source']['organisms']['primary'] != null) {\
+                subject = params['_source']['organisms']['primary'];\
+            }\
+            else if (params['_source']['organisms']['subject'] != null)\
             {\
-                species.add(subject['species']['name']);\
+                subject = params['_source']['organisms']['subject'];\
+            }\
+        }\
+        if (subject != null && (subject instanceof List))\
+        {\
+            for (sample in subject)\
+            {\
+                if (sample['species'] != null && sample['species']['name'] != null)\
+                {\
+                    species.add(sample['species']['name']);\
+                }\
             }\
         }\
         for (item in params['_source']['objects'])\
