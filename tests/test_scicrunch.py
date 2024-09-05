@@ -512,7 +512,7 @@ def test_getting_files_info(client):
 def test_getting_scaffold_files_info(client):
     # mock json for testing
     test_data = {
-        "filetypes" : ["abi-thumbnail", "abi-scaffold-metadata-file", 'abi-scaffold-view-file'],
+        "filetypes" : ["abi-thumbnail", "abi-scaffold-metadata-file", "abi-scaffold-view-file"],
         "curies": ["UBERON:0000948", "UBERON:0000945"]
     }
 

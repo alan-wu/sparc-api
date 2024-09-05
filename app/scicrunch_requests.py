@@ -448,7 +448,7 @@ def create_request_body_for_ids_aggregations(curies, species, file_types):
                 },
                 "aggs": {
                     "id": {
-                        "terms": {"field": "pennsieve.identifier.aggregate"}
+                        "terms": {"size": 400, "field": "pennsieve.identifier.aggregate"}
                     }
                 }
             }
@@ -511,8 +511,10 @@ def get_script_for_aggregations(file_types):
     inline = inline + conditions
     inline = inline + "{String output = id + ',' + ver + ',' + item['dataset']['path'] + \
                 ',' + item['mimetype']['name'] + ',' + t + ',';\
+                String bid = '';\
                 if (item['biolucida'] != null && item['biolucida']['identifier'] != null) { \
                     output = output + item['biolucida']['identifier'] + ',';\
+                    bid = item['biolucida']['identifier'];\
                 } else {\
                     output = output + ',';\
                 }\
@@ -522,9 +524,15 @@ def get_script_for_aggregations(file_types):
                     item['datacite']['isDerivedFrom']['path'];\
                 } else {\
                     output = output + '[],[]';\
-                }\
-                l.add(output);\
-            }\
+                }"
+
+    #only include if there is a biolucida id
+    if "biolucida-2d" in file_types or "biolucida-3d" in file_types:
+        inline = inline + "if (bid != '') { l.add(output); }"
+    else:
+        inline = inline + "l.add(output);"
+    
+    inline = inline + "}\
         }\
         return l;"
     
