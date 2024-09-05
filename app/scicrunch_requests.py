@@ -556,7 +556,7 @@ def create_request_body_for_files_info_aggregations(curies, species, file_types)
                     "files_info": {
                         "terms": {
                             "script": { },
-                            "size": 400
+                            "size": 1000
                         }
                     }
                 }
