@@ -1,1 +1,1 @@
-web: gunicorn main:app
+web: gunicorn main:app --preload --timeout 200 --log-file -
