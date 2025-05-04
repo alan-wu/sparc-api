@@ -59,6 +59,10 @@ from app.osparc.osparc import start_simulation as do_start_simulation
 from app.osparc.osparc import check_simulation as do_check_simulation
 from app.biolucida_process_results import process_results as process_biolucida_results, process_result as process_biolucida_result
 
+import time
+
+start = time.time()
+
 logging.basicConfig()
 
 app = Flask(__name__)
@@ -295,6 +299,10 @@ def shutdown_schedulers():
 
 
 atexit.register(shutdown_schedulers)
+
+print("Start up timer:")
+end = time.time()
+print(end - start)
 
 
 @app.route("/health")
