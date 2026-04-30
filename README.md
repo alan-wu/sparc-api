@@ -74,12 +74,6 @@ pytest
  - Providing the contents of a dataset (ie. does it have a scaffold? Where is the scaffold file located?)
 **Critical:** Critical for much of the /maps page and some functionality of the /data page
 
-#### Wrike
-**Source:** https://www.wrike.com/ \
-**Summary:** Project management software \
-**Used on sparc-api for:** Creates tickets from user feedback to be managed \
-**Critical:** no
-
 #### oSparc
 **Source:** https://osparc.io/ \
 **Summary:**  Biomedeical Modelling and simulation software \

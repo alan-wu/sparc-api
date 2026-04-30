@@ -2056,25 +2056,6 @@ def get_total_dataset_citations():
         logging.error("An error occured while fetching total citations from SciCrunch", ex)
     return jsonify({ 'total_citations': -1, 'message': "An error occured while fetching total citations from SciCrunch" }), 500
 
-@app.route("/search-readme/<query>", methods=["GET"])
-def search_readme(query):
-    url = 'https://dash.readme.com/api/v1/docs/search?search=' + query
-    headers = {'Authorization': 'Basic ' + Config.README_API_KEY}
-
-    try:
-        response = requests.post(
-            url=url,
-            headers=headers
-        )
-        return response.json()
-    except requests.exceptions.HTTPError as err:
-        logging.error(err)
-        return {
-            "error": str(err),
-            "message": "Readme is not currently reachable, please try again later"
-        }, 502
-
-
 @app.route("/metrics", methods=["GET"])
 def metrics():
     return usage_metrics
