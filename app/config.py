@@ -93,3 +93,5 @@ class Config(object):
     TURNSTILE_URL = os.environ.get("TURNSTILE_URL", "https://challenges.cloudflare.com/turnstile/v0/siteverify")
     PMR_HOST = os.environ.get("PMR_HOST", "https://models.physiomeproject.org")
     COMMS_SLACK_WEBHOOK = os.environ.get("COMMS_SLACK_WEBHOOK")
+    COMPRESS_LEVEL = os.environ.get("COMPRESS_LEVEL", 4)
+    COMPRESS_MIN_SIZE = os.environ.get("COMPRESS_MIN_SIZE", 10000)

@@ -74,8 +74,8 @@ executor = ThreadPoolExecutor(max_workers=8)
 
 # set environment variable
 app.config["ENV"] = Config.DEPLOY_ENV
-app.config["COMPRESS_LEVEL"] = 4
-app.config["COMPRESS_MIN_SIZE"] = 10000
+app.config["COMPRESS_LEVEL"] = int(Config.COMPRESS_LEVEL)
+app.config["COMPRESS_MIN_SIZE"] = int(Config.COMPRESS_MIN_SIZE)
 
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 300})
 
