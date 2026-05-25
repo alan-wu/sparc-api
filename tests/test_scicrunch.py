@@ -478,22 +478,6 @@ def test_getting_curies(client):
             assert UBERONS_DICT[item['id']] == item['name'].lower()
 
 
-def test_get_related_terms(client):
-    # Test if we can get the uberon term of heart using the uberon term
-    # of left ventricle
-    r = client.get('/get-related-terms/UBERON:0002084')
-    uberons_results = json.loads(r.data)
-    print(uberons_results)
-    total = len(uberons_results['uberon']['array'])
-    assert total > 0
-    findHeart = False
-    for item in uberons_results['uberon']['array']:
-        if item['id'] == 'UBERON:0000948' and item['name'] == 'heart':
-            findHeart = True
-            break
-    assert findHeart == True
-
-
 def test_scaffold_files(client):
     r = client.get('/filter-search/?size=30')
     results = json.loads(r.data)

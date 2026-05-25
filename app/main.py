@@ -54,7 +54,7 @@ from threading import Lock
 from app.config import Config
 from app.dbtable import AnnotationTable, MapTable, ScaffoldTable, FeaturedDatasetIdSelectorTable, ProtocolMetricsTable
 from app.scicrunch_process_results import process_results, process_get_first_scaffold_info, reform_aggregation_results, \
-    reform_curies_results, reform_dataset_results, reform_related_terms, reform_anatomy_results, \
+    reform_curies_results, reform_dataset_results, reform_anatomy_results, \
     reform_flatmap_query_result, reform_flatmap_uuid_query_result
 from app.serializer import ContactRequestSchema
 from app.utilities import img_to_base64_str, get_path_from_mangled_list, get_extension
@@ -1853,33 +1853,6 @@ def get_available_uberonids():
         result = reform_curies_results(response.json())
     except BaseException as ex:
         logging.error("Failed getting Uberon IDs", ex)
-        return {
-            "message": "Could not parse SciCrunch output, please try again later",
-            "error": "BaseException"
-        }, 502
-
-    return jsonify(result)
-
-
-# Get list of terms a level up/down from
-@app.route("/get-related-terms/<query>")
-def get_related_terms(query):
-    payload = {
-        'direction': request.args.get('direction', default='OUTGOING'),
-        'relationshipType': request.args.get('relationshipType', default='BFO:0000050'),
-        'entail': request.args.get('entail', default='true'),
-        'api_key': Config.KNOWLEDGEBASE_KEY
-    }
-
-    result = {}
-
-    try:
-        response = requests.get(
-            f'{Config.SCI_CRUNCH_SCIGRAPH_HOST}/graph/neighbors/{query}',
-            params=payload)
-        result = reform_related_terms(response.json())
-    except BaseException as ex:
-        logging.error(f"Failed getting related terms with payload {payload}", ex)
         return {
             "message": "Could not parse SciCrunch output, please try again later",
             "error": "BaseException"
