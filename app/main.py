@@ -32,6 +32,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from flask import Flask, abort, jsonify, request
+from flask_compress import Compress
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from pennsieve import Pennsieve
@@ -73,8 +74,12 @@ executor = ThreadPoolExecutor(max_workers=8)
 
 # set environment variable
 app.config["ENV"] = Config.DEPLOY_ENV
+app.config["COMPRESS_LEVEL"] = int(Config.COMPRESS_LEVEL)
+app.config["COMPRESS_MIN_SIZE"] = int(Config.COMPRESS_MIN_SIZE)
+
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 300})
 
+Compress(app)
 CORS(app)
 
 ma = Marshmallow(app)

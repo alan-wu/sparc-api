@@ -10,6 +10,7 @@ contentful_management==2.11.0
 docutils==0.15.2
 Flask==1.1.1
 Flask-Caching==2.3.0
+Flask-Compress==1.24
 Flask-Cors==3.0.8
 flask-marshmallow==0.10.1
 google-api-python-client==2.52.0
