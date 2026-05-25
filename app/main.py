@@ -54,7 +54,7 @@ from threading import Lock
 from app.config import Config
 from app.dbtable import AnnotationTable, MapTable, ScaffoldTable, FeaturedDatasetIdSelectorTable, ProtocolMetricsTable
 from app.scicrunch_process_results import process_results, process_get_first_scaffold_info, reform_aggregation_results, \
-    reform_curies_results, reform_dataset_results, reform_related_terms, reform_anatomy_results, \
+    reform_curies_results, reform_dataset_results, reform_anatomy_results, \
     reform_flatmap_query_result, reform_flatmap_uuid_query_result
 from app.serializer import ContactRequestSchema
 from app.utilities import img_to_base64_str, get_path_from_mangled_list, get_extension
