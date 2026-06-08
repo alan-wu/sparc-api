@@ -709,7 +709,7 @@ def get_is_derived_from_with_identifier_or_path(discoverId, version, objects, id
                 for i in range(len(derivedfromdatasetdoi)):
                     if 0 <= i < len(derivedfromdatasetpath):
                         doi = derivedfromdatasetdoi[i].replace('https://doi.org/', '')
-                        source_list.extend(get_original_source(None, doi, None, derivedfromdatasetpath[i], datasetCache))
+                        source_list.extend(get_original_source(None, doi, None, derivedfromdatasetpath[i], datasetCache, True))
 
     return source_list
 
@@ -727,8 +727,7 @@ def get_original_source_in_dataset(dataset_info, identifier, matchingPath, datas
             return get_is_derived_from_with_identifier_or_path(discoverId, version, objects, identifier, matchingPath, datasetCache)
     return []
 
-
-def get_original_source(identifier, doi, discoverId, path, datasetCache):
+def get_original_source(identifier, doi, discoverId, path, datasetCache, fromDerived = False):
     query = None
     id = identifier
     if identifier is not None:
@@ -745,6 +744,10 @@ def get_original_source(identifier, doi, discoverId, path, datasetCache):
     if dataset_info is None:
         dataset_info = dataset_search(query)
         datasetCache[id] = dataset_info
+    hits = dataset_info.get('hits', {}).get('hits', [])
+    if len(hits) == 0 and fromDerived and doi and path:
+        return [{ "doi": doi, "path": path }]
+
     return get_original_source_in_dataset(dataset_info, identifier, path, datasetCache)
 
 
