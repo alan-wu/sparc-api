@@ -225,9 +225,10 @@ def test_get_original_source_from_external_id_and_path(client):
     assert len(response['result']) > 0
     found = 0
     for item in response['result']:
-        if item['discoverId'] == '438':
+        print(item)
+        if item.get('discoverId', '') == '438' or item.get('doi', '') == '10.26275/ugoe-ccnw':
             found = found + 1
-    assert found > 0
+    assert found > 1
 
 def test_title_plot_annotation_dataset_search(client):
     print()
