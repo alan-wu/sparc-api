@@ -53,6 +53,7 @@ class Config(object):
     SCI_CRUNCH_SCIGRAPH_HOST = os.environ.get("SCI_CRUNCH_SCIGRAPH_HOST", "https://scicrunch.org/api/1/sparc-scigraph")
     SCI_CRUNCH_CITATIONS_HOST = os.environ.get("SCI_CRUNCH_CITATIONS_HOST", "https://api.scicrunch.io/elastic/v2/SPARC_Citations_pr")
     SCI_CRUNCH_QDB_HOST = os.environ.get("SCI_CRUNCH_QDB_HOST", "https://services.scicrunch.io/quantdb/api/1/values")
+    SCI_CRUNCH_RESOLVER_HOST = os.environ.get("SCI_CRUNCH_RESOLVER_HOST", "https://scicrunch.org/resolver")
     HUBSPOT_API_TOKEN = os.environ.get("HUBSPOT_API_TOKEN")
     HUBSPOT_CLIENT_SECRET = os.environ.get("HUBSPOT_CLIENT_SECRET")
     EMAIL_OCTOPUS_API_KEY = os.environ.get("EMAIL_OCTOPUS_API_KEY")

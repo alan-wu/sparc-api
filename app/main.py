@@ -558,6 +558,25 @@ def sci_doi(doi1, doi2):
         return json.dumps({'error': err})
 
 
+# /scicrunch/resolver/<rrid>: Proxies requests to the SciCrunch resolver API
+@app.route("/scicrunch/resolver/<path:rrid>")
+def sci_resolver(rrid):
+    try:
+        response = requests.get(
+            f'{Config.SCI_CRUNCH_RESOLVER_HOST}/{rrid}.json',
+            timeout=30
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        return jsonify({'error': 'Unable to connect to SciCrunch resolver'}), 502
+    except requests.exceptions.Timeout:
+        return jsonify({'error': 'Request to SciCrunch resolver timed out'}), 504
+    except requests.exceptions.RequestException as err:
+        logging.error(err)
+        return jsonify({'error': str(err)}), 502
+
+
 # /pubmed/<id> Used as a proxy for making requests to pubmed
 @app.route("/pubmed/<id_>")
 @app.route("/pubmed/<id_>/")
