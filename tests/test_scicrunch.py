@@ -523,3 +523,14 @@ def test_dataset_citations_search(client):
     json_data = json.loads(data)
     assert 'id' in json_data
     assert json_data['id'] == identifier
+
+
+def test_scicrunch_resolver(client):
+    # Test the SciCrunch resolver proxy endpoint with RRID:SCR_018709
+    r = client.get('/scicrunch/resolver/RRID:SCR_018709')
+    assert r.status_code == 200
+    json_data = json.loads(r.data)
+    # The resolver response should contain resolver metadata and hits
+    assert 'resolver' in json_data
+    assert 'hits' in json_data
+    assert json_data['hits']['total'] > 0
